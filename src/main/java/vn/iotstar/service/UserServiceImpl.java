@@ -124,4 +124,19 @@ public class UserServiceImpl implements IUserService {
     public User findByEmail(String email) {
         return userDao.findByEmail(email);
     }
+
+    @Override
+    public User findById(int id) {
+        return userDao.findById(id);
+    }
+
+    @Override
+    public void update(User user) {
+        userDao.update(user);
+    }
+
+    @Override
+    public java.util.List<User> findAll() {
+        return userDao.findAll();
+    }
 }

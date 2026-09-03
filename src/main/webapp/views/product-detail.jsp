@@ -34,6 +34,15 @@
     <div class="nav">
         <a href="<c:url value='/home'/>">Trang chu</a>
         <a href="<c:url value='/product'/>">Tat ca san pham</a>
+        <c:choose>
+            <c:when test="${not empty sessionScope.account}">
+                <a href="<c:url value='/profile'/>">Hồ sơ</a>
+                <a href="<c:url value='/logout'/>">Dang xuat</a>
+            </c:when>
+            <c:otherwise>
+                <a href="<c:url value='/login'/>">Dang nhap</a>
+            </c:otherwise>
+        </c:choose>
     </div>
 </div>
 

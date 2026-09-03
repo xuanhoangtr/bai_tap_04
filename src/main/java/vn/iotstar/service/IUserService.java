@@ -10,4 +10,7 @@ public interface IUserService {
     boolean resetPassword(String email, String otp, String newPassword);
     User findByUsername(String username);
     User findByEmail(String email);
+    User findById(int id);
+    void update(User user);
+    java.util.List<User> findAll();
 }

@@ -27,6 +27,12 @@ public class User implements Serializable {
     @Column(name = "fullname", columnDefinition = "nvarchar(100)")
     private String fullname;
 
+    @Column(name = "phone", length = 20)
+    private String phone;
+
+    @Column(name = "images", columnDefinition = "nvarchar(500)")
+    private String images;
+
     @Column(name = "status")
     private int status; // 0: Chua kich hoat (cho OTP), 1: Da kich hoat
 
@@ -45,6 +51,17 @@ public class User implements Serializable {
         this.email = email;
         this.password = password;
         this.fullname = fullname;
+        this.status = status;
+    }
+
+    public User(int id, String username, String email, String password, String fullname, String phone, String images, int status) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.fullname = fullname;
+        this.phone = phone;
+        this.images = images;
         this.status = status;
     }
 
@@ -86,6 +103,22 @@ public class User implements Serializable {
 
     public void setFullname(String fullname) {
         this.fullname = fullname;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getImages() {
+        return images;
+    }
+
+    public void setImages(String images) {
+        this.images = images;
     }
 
     public int getStatus() {

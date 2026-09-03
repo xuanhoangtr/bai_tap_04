@@ -32,7 +32,7 @@
     <div class="nav">
         <c:choose>
             <c:when test="${not empty sessionScope.account}">
-                <span>Xin chao, ${sessionScope.account.fullName}</span> |
+                <a href="<c:url value='/profile'/>">Hồ sơ (${sessionScope.account.fullName})</a> |
                 <a href="<c:url value='/logout'/>">Dang xuat</a>
             </c:when>
             <c:otherwise>
@@ -47,6 +47,7 @@
     <div class="quick-nav">
         <a href="<c:url value='/home'/>" style="background-color: #007bff; color: white;">Trang chu</a>
         <a href="<c:url value='/product'/>">Xem tat ca san pham</a>
+        <a href="<c:url value='/profile'/>">Ho so User</a>
         <a href="<c:url value='/admin/categories'/>">Quan tri Danh muc</a>
         <a href="<c:url value='/admin/products'/>">Quan tri San pham</a>
     </div>

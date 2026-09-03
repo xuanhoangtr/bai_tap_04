@@ -7,6 +7,19 @@
 
     <display-name>Web Servlet Project</display-name>
 
+    <!-- SiteMesh Decorator Filter -->
+    <filter>
+        <filter-name>sitemesh</filter-name>
+        <filter-class>vn.iotstar.config.MySiteMeshFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>sitemesh</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
+
     <!-- Keep the session id in a cookie instead of appending ;jsessionid to URLs. -->
     <session-config>
         <tracking-mode>COOKIE</tracking-mode>

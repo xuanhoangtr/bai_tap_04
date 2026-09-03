@@ -71,7 +71,7 @@ public class LoginController extends HttpServlet {
             }
 
             // Dang nhap thanh cong
-            UserModel account = new UserModel(iotUser.getId(), iotUser.getEmail(), iotUser.getUsername(), iotUser.getFullname(), iotUser.getPassword());
+            UserModel account = new UserModel(iotUser.getId(), iotUser.getEmail(), iotUser.getUsername(), iotUser.getFullname(), iotUser.getPassword(), iotUser.getPhone(), iotUser.getImages());
             HttpSession session = req.getSession(true);
             session.setAttribute(Constant.SESSION_ACCOUNT, account);
 

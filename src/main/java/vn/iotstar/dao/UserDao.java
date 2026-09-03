@@ -21,6 +21,8 @@ public class UserDao implements IUserDao {
         defaultUser.setPassword("123");
         defaultUser.setEmail("xuanhoangtr@gmail.com");
         defaultUser.setFullname("Tran Xuan Hoang");
+        defaultUser.setPhone("0987654321");
+        defaultUser.setImages("avatar.png");
         defaultUser.setStatus(1); // da kich hoat
         memoryUsers.add(defaultUser);
     }

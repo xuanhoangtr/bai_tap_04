@@ -10,6 +10,8 @@ public class UserModel implements Serializable {
     private String userName;
     private String fullName;
     private String passWord;
+    private String phone;
+    private String images;
 
     public UserModel() {
     }
@@ -20,6 +22,16 @@ public class UserModel implements Serializable {
         this.userName = userName;
         this.fullName = fullName;
         this.passWord = passWord;
+    }
+
+    public UserModel(int id, String email, String userName, String fullName, String passWord, String phone, String images) {
+        this.id = id;
+        this.email = email;
+        this.userName = userName;
+        this.fullName = fullName;
+        this.passWord = passWord;
+        this.phone = phone;
+        this.images = images;
     }
 
     public int getId() {
@@ -60,5 +72,21 @@ public class UserModel implements Serializable {
 
     public void setPassWord(String passWord) {
         this.passWord = passWord;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getImages() {
+        return images;
+    }
+
+    public void setImages(String images) {
+        this.images = images;
     }
 }
