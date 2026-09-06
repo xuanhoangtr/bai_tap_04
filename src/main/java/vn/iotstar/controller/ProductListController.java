@@ -40,6 +40,6 @@ public class ProductListController extends HttpServlet {
         req.setAttribute("totalPages", totalPages);
         req.setAttribute("totalCount", totalCount);
 
-        req.getRequestDispatcher("/views/product-list.jsp").forward(req, resp);
+        req.getRequestDispatcher("/views/product-list.jsp").include(req, resp);
     }
 }

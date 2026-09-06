@@ -28,7 +28,7 @@ public class ProductDetailController extends HttpServlet {
             Product product = productService.findById(id);
             if (product != null) {
                 req.setAttribute("product", product);
-                req.getRequestDispatcher("/views/product-detail.jsp").forward(req, resp);
+                req.getRequestDispatcher("/views/product-detail.jsp").include(req, resp);
                 return;
             }
         } catch (NumberFormatException ignored) {

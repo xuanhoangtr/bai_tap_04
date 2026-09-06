@@ -15,17 +15,17 @@ public class Category implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "CategoryId")
+    @Column(name = "categoryid")
     private int categoryid;
 
-    @Column(name = "CategoryName", columnDefinition = "nvarchar(50) not null")
+    @Column(name = "categoryname", nullable = false, length = 255)
     @NotEmpty(message = "Khong duoc phep rong")
     private String categoryname;
 
-    @Column(name = "Images", columnDefinition = "nvarchar(500) null")
+    @Column(name = "images", length = 500)
     private String images;
 
-    @Column(name = "Status")
+    @Column(name = "status")
     private int status;
 
     // bi-directional many-to-one association to Video

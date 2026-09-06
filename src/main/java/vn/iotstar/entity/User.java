@@ -21,16 +21,16 @@ public class User implements Serializable {
     @Column(name = "email", nullable = false, length = 100)
     private String email;
 
-    @Column(name = "password", nullable = false, length = 100)
+    @Column(name = "password", nullable = false, length = 255)
     private String password;
 
-    @Column(name = "fullname", columnDefinition = "nvarchar(100)")
+    @Column(name = "fullname", length = 100)
     private String fullname;
 
     @Column(name = "phone", length = 20)
     private String phone;
 
-    @Column(name = "images", columnDefinition = "nvarchar(500)")
+    @Column(name = "images", length = 500)
     private String images;
 
     @Column(name = "status")

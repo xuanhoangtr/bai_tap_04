@@ -2,117 +2,95 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Danh sach san pham - Phan trang 6sp/trang</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; color: #333; }
-        .header { background-color: #007bff; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { margin: 0; font-size: 20px; }
-        .header .nav a { color: white; text-decoration: none; margin-left: 15px; font-size: 14px; font-weight: bold; }
-        .container { max-width: 1100px; margin: 25px auto; padding: 0 15px; }
-        .quick-nav { background: white; padding: 15px 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 25px; display: flex; gap: 15px; flex-wrap: wrap; }
-        .quick-nav a { display: inline-block; padding: 8px 16px; background-color: #e9ecef; color: #495057; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px; }
-        .quick-nav a:hover { background-color: #007bff; color: white; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #007bff; }
-        .section-header h2 { margin: 0; font-size: 18px; }
-        .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .product-card { background: white; border: 1px solid #e0e0e0; border-radius: 6px; padding: 16px; text-decoration: none; color: inherit; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
-        .product-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
-        .product-img { width: 100%; height: 180px; object-fit: contain; background: #fdfdfd; border-radius: 4px; margin-bottom: 12px; }
-        .product-name { font-weight: bold; font-size: 16px; margin-bottom: 8px; }
-        .product-category { font-size: 13px; color: #6c757d; margin-bottom: 8px; }
-        .product-price { font-size: 16px; color: #dc3545; font-weight: bold; margin-top: auto; }
-        .pagination { display: flex; justify-content: center; align-items: center; margin-top: 30px; gap: 6px; }
-        .pagination a, .pagination span { display: inline-block; padding: 8px 14px; border: 1px solid #dee2e6; border-radius: 4px; color: #007bff; text-decoration: none; font-size: 14px; font-weight: bold; }
-        .pagination a:hover { background-color: #e9ecef; }
-        .pagination .active { background-color: #007bff; color: white; border-color: #007bff; }
-        .pagination .disabled { color: #6c757d; pointer-events: none; background-color: #f8f9fa; }
-    </style>
+    <title>Danh sách sản phẩm - Phân trang 6sp/trang</title>
 </head>
 <body>
 
-<div class="header">
-    <h1>HE THONG QUAN LY BAN HANG</h1>
-    <div class="nav">
-        <c:choose>
-            <c:when test="${not empty sessionScope.account}">
-                <a href="<c:url value='/profile'/>">Hồ sơ (${sessionScope.account.fullName})</a> |
-                <a href="<c:url value='/logout'/>">Dang xuat</a>
-            </c:when>
-            <c:otherwise>
-                <a href="<c:url value='/login'/>">Dang nhap</a>
-                <a href="<c:url value='/register'/>">Dang ky</a>
-            </c:otherwise>
-        </c:choose>
-    </div>
-</div>
-
-<div class="container">
-    <div class="quick-nav">
-        <a href="<c:url value='/home'/>">Trang chu</a>
-        <a href="<c:url value='/product'/>" style="background-color: #007bff; color: white;">Xem tat ca san pham</a>
-        <a href="<c:url value='/profile'/>">Ho so User</a>
-        <a href="<c:url value='/admin/categories'/>">Quan tri Danh muc</a>
-        <a href="<c:url value='/admin/products'/>">Quan tri San pham</a>
-    </div>
-
-    <div class="section-header">
-        <h2>TAT CA SAN PHAM (Trang ${currentPage} / ${totalPages} - Tong: ${totalCount} san pham)</h2>
-    </div>
-
-    <div class="product-grid">
-        <c:forEach var="p" items="${products}">
-            <a href="<c:url value='/product/detail?id=${p.productId}'/>" class="product-card">
-                <c:choose>
-                    <c:when test="${p.images.substring(0,5) == 'https'}">
-                        <img src="${p.images}" alt="${p.productName}" class="product-img" />
-                    </c:when>
-                    <c:otherwise>
-                        <c:url value="/image?fname=${p.images}" var="imgUrl"/>
-                        <img src="${imgUrl}" alt="${p.productName}" class="product-img" />
-                    </c:otherwise>
-                </c:choose>
-                <div class="product-name">${p.productName}</div>
-                <div class="product-category">Danh muc: ${p.category != null ? p.category.categoryname : 'Chua phan loai'}</div>
-                <div class="product-price">${p.formattedPrice}</div>
+    <!-- Header & Info -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h4 class="fw-bold text-dark border-start border-4 border-primary ps-3 mb-1">
+                TẤT CẢ SẢN PHẨM
+            </h4>
+            <p class="text-muted small mb-0 ps-3">
+                Trang ${currentPage} / ${totalPages} &mdash; Tổng cộng ${totalCount} sản phẩm
+            </p>
+        </div>
+        <div>
+            <a href="<c:url value='/admin/product/add'/>" class="btn btn-outline-primary btn-sm fw-semibold">
+                Thêm sản phẩm mới (Admin)
             </a>
-        </c:forEach>
+        </div>
     </div>
 
-    <!-- Thanh phan trang (6 san pham / trang) -->
-    <div class="pagination">
-        <c:choose>
-            <c:when test="${currentPage > 1}">
-                <a href="<c:url value='/product?page=${currentPage - 1}'/>">Trang truoc</a>
-            </c:when>
-            <c:otherwise>
-                <span class="disabled">Trang truoc</span>
-            </c:otherwise>
-        </c:choose>
+    <!-- Product Grid (6 items per page) -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+        <c:forEach var="p" items="${products}">
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 product-card">
+                    <c:choose>
+                        <c:when test="${not empty p.images and p.images.startsWith('http')}">
+                            <img src="${p.images}" alt="${p.productName}" class="card-img-top p-3" style="height: 200px; object-fit: contain;" />
+                        </c:when>
+                        <c:when test="${not empty p.images}">
+                            <img src="<c:url value='/image?fname=${p.images}'/>" alt="${p.productName}" class="card-img-top p-3" style="height: 200px; object-fit: contain;" />
+                        </c:when>
+                        <c:otherwise>
+                            <img src="<c:url value='/image?fname=avatar.png'/>" alt="${p.productName}" class="card-img-top p-3" style="height: 200px; object-fit: contain;" />
+                        </c:otherwise>
+                    </c:choose>
 
-        <c:forEach var="i" begin="1" end="${totalPages}">
-            <c:choose>
-                <c:when test="${i == currentPage}">
-                    <span class="active">${i}</span>
-                </c:when>
-                <c:otherwise>
-                    <a href="<c:url value='/product?page=${i}'/>">${i}</a>
-                </c:otherwise>
-            </c:choose>
+                    <div class="card-body d-flex flex-column p-3">
+                        <span class="badge bg-light text-muted border text-start mb-2" style="width: fit-content;">
+                            ${p.category != null ? p.category.categoryname : 'Chưa phân loại'}
+                        </span>
+                        <h5 class="card-title fw-bold text-truncate mb-2" title="${p.productName}">
+                            <a href="<c:url value='/product/detail?id=${p.productId}'/>" class="text-decoration-none text-dark">
+                                ${p.productName}
+                            </a>
+                        </h5>
+                        <p class="card-text text-muted small text-truncate mb-3">${p.description}</p>
+                        
+                        <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-danger fs-5">${p.formattedPrice}</span>
+                            <a href="<c:url value='/product/detail?id=${p.productId}'/>" class="btn btn-primary btn-sm">
+                                Chi tiết
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </c:forEach>
-
-        <c:choose>
-            <c:when test="${currentPage < totalPages}">
-                <a href="<c:url value='/product?page=${currentPage + 1}'/>">Trang sau</a>
-            </c:when>
-            <c:otherwise>
-                <span class="disabled">Trang sau</span>
-            </c:otherwise>
-        </c:choose>
+        <c:if test="${empty products}">
+            <div class="col-12 text-center py-5 text-muted">
+                Không có sản phẩm nào trong danh sách.
+            </div>
+        </c:if>
     </div>
-</div>
+
+    <!-- Bootstrap 5 Pagination -->
+    <c:if test="${totalPages > 1}">
+        <nav aria-label="Page navigation" class="d-flex justify-content-center mb-4">
+            <ul class="pagination">
+                <li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="<c:url value='/product?page=${currentPage - 1}'/>">Trang trước</a>
+                </li>
+
+                <c:forEach var="i" begin="1" end="${totalPages}">
+                    <li class="page-item ${i == currentPage ? 'active' : ''}">
+                        <a class="page-link" href="<c:url value='/product?page=${i}'/>">${i}</a>
+                    </li>
+                </c:forEach>
+
+                <li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="<c:url value='/product?page=${currentPage + 1}'/>">Trang sau</a>
+                </li>
+            </ul>
+        </nav>
+    </c:if>
 
 </body>
 </html>

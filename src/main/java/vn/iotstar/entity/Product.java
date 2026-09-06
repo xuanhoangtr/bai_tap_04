@@ -11,19 +11,19 @@ public class Product implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "productId")
+    @Column(name = "productid")
     private int productId;
 
-    @Column(name = "productName", columnDefinition = "nvarchar(255) not null")
+    @Column(name = "productname", nullable = false, length = 255)
     private String productName;
 
-    @Column(name = "description", columnDefinition = "nvarchar(max)")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "price")
     private double price;
 
-    @Column(name = "images", columnDefinition = "nvarchar(500)")
+    @Column(name = "images", length = 500)
     private String images;
 
     @Column(name = "quantity")
@@ -33,7 +33,7 @@ public class Product implements Serializable {
     private int status; // 1: Hoat dong, 0: Ngung ban
 
     @ManyToOne
-    @JoinColumn(name = "categoryId")
+    @JoinColumn(name = "categoryid")
     private Category category;
 
     public Product() {

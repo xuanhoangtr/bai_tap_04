@@ -22,7 +22,7 @@ public class HomeController extends HttpServlet {
         // Lay 10 san pham moi nhat len trang chu
         List<Product> top10 = productService.findTop10Latest();
         req.setAttribute("top10Products", top10);
-        req.getRequestDispatcher("/views/index.jsp").forward(req, resp);
+        req.getRequestDispatcher("/views/index.jsp").include(req, resp);
     }
 
     @Override
