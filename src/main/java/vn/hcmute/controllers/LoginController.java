@@ -22,14 +22,12 @@ public class LoginController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Kiem tra neu da co session account thi vao thang trang chu
         HttpSession session = req.getSession(false);
         if (session != null && session.getAttribute(Constant.SESSION_ACCOUNT) != null) {
             resp.sendRedirect(req.getContextPath() + "/home");
             return;
         }
 
-        // Kiem tra cookie remember me de tu dong dien hoac tu dong dang nhap
         Cookie[] cookies = req.getCookies();
         if (cookies != null) {
             for (Cookie c : cookies) {
@@ -53,30 +51,42 @@ public class LoginController extends HttpServlet {
         String remember = req.getParameter("remember");
         boolean isRememberMe = "on".equals(remember);
 
-        // 1. Kiem tra trong bang User JPA (co ho tro OTP)
-        vn.iotstar.entity.User iotUser = iotUserService.findByUsername(username);
+        req.setAttribute("username", username);
+
+        // Server-side Validation
+        if (username == null || username.trim().isEmpty()) {
+            req.setAttribute("alert", "Tên đăng nhập không được để trống.");
+            req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+            return;
+        }
+        if (password == null || password.trim().isEmpty()) {
+            req.setAttribute("alert", "Mật khẩu không được để trống.");
+            req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+            return;
+        }
+
+        // 1. Kiểm tra trong bảng User JPA
+        vn.iotstar.entity.User iotUser = iotUserService.findByUsername(username.trim());
         if (iotUser != null) {
             if (!iotUser.getPassword().equals(password)) {
-                req.setAttribute("alert", "Mat khau khong chinh xac.");
+                req.setAttribute("alert", "Mật khẩu không chính xác.");
                 req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
                 return;
             }
 
-            // Kiem tra kich hoat OTP
             if (iotUser.getStatus() != 1) {
-                req.setAttribute("alert", "Tai khoan chua duoc kich hoat qua Email OTP. Vui long nhap ma OTP de kich hoat.");
+                req.setAttribute("alert", "Tài khoản chưa được kích hoạt qua Email OTP. Vui lòng nhập mã OTP để kích hoạt.");
                 req.setAttribute("email", iotUser.getEmail());
                 req.getRequestDispatcher("/views/verify-otp.jsp").forward(req, resp);
                 return;
             }
 
-            // Dang nhap thanh cong
             UserModel account = new UserModel(iotUser.getId(), iotUser.getEmail(), iotUser.getUsername(), iotUser.getFullname(), iotUser.getPassword(), iotUser.getPhone(), iotUser.getImages());
             HttpSession session = req.getSession(true);
             session.setAttribute(Constant.SESSION_ACCOUNT, account);
 
             if (isRememberMe) {
-                Cookie cookie = new Cookie(Constant.COOKIE_REMEMBER, username);
+                Cookie cookie = new Cookie(Constant.COOKIE_REMEMBER, username.trim());
                 cookie.setMaxAge(30 * 60);
                 cookie.setPath("/");
                 resp.addCookie(cookie);
@@ -86,14 +96,14 @@ public class LoginController extends HttpServlet {
             return;
         }
 
-        // 2. Kiem tra nguoi dung cu
-        UserModel user = userService.login(username, password);
+        // 2. Kiểm tra fallback
+        UserModel user = userService.login(username.trim(), password);
         if (user != null) {
             HttpSession session = req.getSession(true);
             session.setAttribute(Constant.SESSION_ACCOUNT, user);
 
             if (isRememberMe) {
-                Cookie cookie = new Cookie(Constant.COOKIE_REMEMBER, username);
+                Cookie cookie = new Cookie(Constant.COOKIE_REMEMBER, username.trim());
                 cookie.setMaxAge(30 * 60);
                 cookie.setPath("/");
                 resp.addCookie(cookie);
@@ -101,7 +111,7 @@ public class LoginController extends HttpServlet {
 
             resp.sendRedirect(req.getContextPath() + "/home");
         } else {
-            req.setAttribute("alert", "Tai khoan hoac mat khau khong chinh xac.");
+            req.setAttribute("alert", "Tài khoản hoặc mật khẩu không chính xác.");
             req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
         }
     }

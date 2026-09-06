@@ -1,51 +1,90 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Edit Category</title>
+    <title>Chỉnh sửa danh mục - Admin</title>
 </head>
 <body>
 
-    <h2>Edit Category</h2>
-    <hr/>
+    <div class="mb-4">
+        <h4 class="fw-bold mb-1">CHỈNH SỬA DANH MỤC</h4>
+        <p class="text-muted small mb-0">Cập nhật thông tin danh mục #${cate.categoryid}</p>
+    </div>
 
-    <form action="<c:url value='/admin/category/update'/>" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="categoryid" value="${cate.categoryid}">
+    <c:if test="${not empty error}">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Lỗi:</strong> ${error}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </c:if>
 
-        <label for="categoryname">Category name:</label><br>
-        <input type="text" id="categoryname" name="categoryname" value="${cate.categoryname}" required><br><br>
+    <div class="card shadow-sm border-0" style="max-width: 700px;">
+        <div class="card-body p-4">
+            <form action="<c:url value='/admin/category/update'/>" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <input type="hidden" name="categoryid" value="${cate.categoryid}" />
 
-        <label for="images">Link images:</label><br>
-        <input type="text" id="images" name="images" value="${cate.images}"><br><br>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Tên danh mục: <span class="text-danger">*</span></label>
+                    <input type="text" name="categoryname" class="form-control" value="${cate.categoryname}" required minlength="2" placeholder="Nhập tên danh mục..." />
+                    <div class="invalid-feedback small">Vui lòng nhập tên danh mục (tối thiểu 2 ký tự).</div>
+                </div>
 
-        <c:choose>
-            <c:when test="${not empty cate.images and cate.images.startsWith('http')}">
-                <c:url value="${cate.images}" var="imgUrl"></c:url>
-            </c:when>
-            <c:otherwise>
-                <c:url value="/image?fname=${cate.images}" var="imgUrl"></c:url>
-            </c:otherwise>
-        </c:choose>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Trạng thái hoạt động:</label>
+                    <select name="status" class="form-select">
+                        <option value="1" ${cate.status == 1 ? 'selected' : ''}>Hoạt động</option>
+                        <option value="0" ${cate.status == 0 ? 'selected' : ''}>Tạm khóa</option>
+                    </select>
+                </div>
 
-        <img height="150" width="200" src="${imgUrl}" /><br><br>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Hình ảnh hiện tại:</label>
+                    <div class="mb-2">
+                        <c:choose>
+                            <c:when test="${not empty cate.images and cate.images.startsWith('http')}">
+                                <img src="${cate.images}" class="rounded border" style="width: 80px; height: 80px; object-fit: cover;" alt="Category" />
+                            </c:when>
+                            <c:when test="${not empty cate.images}">
+                                <img src="<c:url value='/image?fname=${cate.images}'/>" class="rounded border" style="width: 80px; height: 80px; object-fit: cover;" alt="Category" />
+                            </c:when>
+                            <c:otherwise>
+                                <img src="<c:url value='/image?fname=avatar.png'/>" class="rounded border" style="width: 80px; height: 80px; object-fit: cover;" alt="Category" />
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                    <input type="file" name="images1" class="form-control" accept="image/*" />
+                    <div class="form-text small">Chọn file ảnh mới nếu muốn thay thế ảnh cũ.</div>
+                </div>
 
-        <label for="images1">Upload images:</label><br>
-        <input type="file" id="images1" name="images1"><br><br>
+                <div class="mb-4">
+                    <label class="form-label fw-semibold small">Hoặc cập nhật URL hình ảnh:</label>
+                    <input type="url" name="images" class="form-control" value="${cate.images.startsWith('http') ? cate.images : ''}" placeholder="https://example.com/image.jpg" />
+                </div>
 
-        <label>Status:</label><br>
-        <input type="radio" id="ston" name="status" value="1" ${cate.status == 1 ? 'checked' : ''}>
-        <label for="ston">Hoat dong</label><br>
-        <input type="radio" id="stoff" name="status" value="0" ${cate.status != 1 ? 'checked' : ''}>
-        <label for="stoff">Khoa</label>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-4 fw-semibold">Cập nhật</button>
+                    <a href="<c:url value='/admin/categories'/>" class="btn btn-outline-secondary">Hủy bỏ</a>
+                </div>
+            </form>
+        </div>
+    </div>
 
-        <br><br>
-        <input type="submit" value="Update">
-    </form>
-
-    <br/>
-    <p><a href="<c:url value='/admin/categories'/>">Quay lai danh sach</a></p>
-
+    <script>
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
 </body>
 </html>

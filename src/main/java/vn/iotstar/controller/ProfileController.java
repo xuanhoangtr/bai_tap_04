@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -28,6 +30,7 @@ public class ProfileController extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private final IUserService userService = new UserServiceImpl();
+    private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "jpeg", "png", "gif", "webp");
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -70,7 +73,7 @@ public class ProfileController extends HttpServlet {
         }
 
         if (user == null) {
-            req.setAttribute("error", "Không tìm thấy thông tin tài khoản người dùng!");
+            req.setAttribute("error", "Không tìm thấy thông tin tài khoản người dùng.");
             req.getRequestDispatcher("/views/profile.jsp").include(req, resp);
             return;
         }
@@ -79,14 +82,31 @@ public class ProfileController extends HttpServlet {
         String phone = req.getParameter("phone");
         String images = req.getParameter("images");
 
-        if (fullname != null && !fullname.trim().isEmpty()) {
-            user.setFullname(fullname.trim());
-        }
-        if (phone != null) {
-            user.setPhone(phone.trim());
+        // 1. Validation Fullname
+        if (fullname == null || fullname.trim().isEmpty() || fullname.trim().length() < 2) {
+            req.setAttribute("error", "Họ và tên không được để trống và phải có ít nhất 2 ký tự.");
+            req.setAttribute("user", user);
+            req.getRequestDispatcher("/views/profile.jsp").include(req, resp);
+            return;
         }
 
-        // Upload file Multipart
+        // 2. Validation Phone
+        if (phone != null && !phone.trim().isEmpty()) {
+            phone = phone.trim();
+            if (!phone.matches("^0[0-9]{9}$")) {
+                req.setAttribute("error", "Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0.");
+                req.setAttribute("user", user);
+                req.getRequestDispatcher("/views/profile.jsp").include(req, resp);
+                return;
+            }
+            user.setPhone(phone);
+        } else {
+            user.setPhone("");
+        }
+
+        user.setFullname(fullname.trim());
+
+        // 3. Upload file Multipart
         String uploadPath = Constant.DIR;
         File uploadDir = new File(uploadPath);
         if (!uploadDir.exists()) {
@@ -94,45 +114,61 @@ public class ProfileController extends HttpServlet {
         }
 
         String oldImage = user.getImages();
+        String contentType = req.getContentType();
 
-        try {
-            Part part = req.getPart("images1");
-            if (part != null && part.getSize() > 0) {
-                String submittedFileName = part.getSubmittedFileName();
-                if (submittedFileName != null && !submittedFileName.isEmpty()) {
-                    String filename = Paths.get(submittedFileName).getFileName().toString();
-                    int dotIndex = filename.lastIndexOf(".");
-                    String ext = (dotIndex > 0) ? filename.substring(dotIndex + 1) : "png";
-                    String fname = "avatar_" + System.currentTimeMillis() + "." + ext;
+        if (contentType != null && contentType.toLowerCase().startsWith("multipart/")) {
+            try {
+                Part part = req.getPart("images1");
+                if (part != null && part.getSize() > 0) {
+                    String submittedFileName = part.getSubmittedFileName();
+                    if (submittedFileName != null && !submittedFileName.isEmpty()) {
+                        String filename = Paths.get(submittedFileName).getFileName().toString();
+                        int dotIndex = filename.lastIndexOf(".");
+                        String ext = (dotIndex > 0) ? filename.substring(dotIndex + 1).toLowerCase() : "png";
 
-                    part.write(uploadPath + File.separator + fname);
-                    user.setImages(fname);
+                        if (!ALLOWED_EXTENSIONS.contains(ext)) {
+                            req.setAttribute("error", "Định dạng file ảnh không hợp lệ (chỉ chấp nhận JPG, PNG, GIF, WebP).");
+                            req.setAttribute("user", user);
+                            req.getRequestDispatcher("/views/profile.jsp").include(req, resp);
+                            return;
+                        }
 
-                    // Xóa file cũ nếu không phải ảnh mặc định hoặc URL
-                    if (oldImage != null && !oldImage.isEmpty() && !oldImage.startsWith("http") && !"avatar.png".equals(oldImage)) {
-                        try {
-                            Files.deleteIfExists(Paths.get(uploadPath + File.separator + oldImage));
-                        } catch (Exception ignored) {}
+                        String fname = "avatar_" + System.currentTimeMillis() + "." + ext;
+                        part.write(uploadPath + File.separator + fname);
+                        user.setImages(fname);
+
+                        // Xóa file cũ nếu không phải ảnh mặc định hoặc URL
+                        if (oldImage != null && !oldImage.isEmpty() && !oldImage.startsWith("http") && !"avatar.png".equals(oldImage)) {
+                            try {
+                                Files.deleteIfExists(Paths.get(uploadPath + File.separator + oldImage));
+                            } catch (Exception ignored) {}
+                        }
                     }
                 }
-            } else if (images != null && !images.trim().isEmpty()) {
-                user.setImages(images.trim());
+            } catch (Exception e) {
+                e.printStackTrace();
+                req.setAttribute("error", "Lỗi khi upload file ảnh: " + e.getMessage());
+                req.setAttribute("user", user);
+                req.getRequestDispatcher("/views/profile.jsp").include(req, resp);
+                return;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }
+        
+        if (images != null && !images.trim().isEmpty()) {
+            user.setImages(images.trim());
         }
 
-        // Cập nhật JPA Database
+        // 4. Cập nhật JPA Database
         userService.update(user);
 
-        // Đồng bộ Session Account để giao diện header/navbar cập nhật ngay lập tức
+        // 5. Đồng bộ Session Account
         account.setFullName(user.getFullname());
         account.setPhone(user.getPhone());
         account.setImages(user.getImages());
         session.setAttribute(Constant.SESSION_ACCOUNT, account);
 
         req.setAttribute("user", user);
-        req.setAttribute("message", "Cập nhật hồ sơ tài khoản thành công!");
+        req.setAttribute("message", "Cập nhật hồ sơ tài khoản thành công.");
         req.getRequestDispatcher("/views/profile.jsp").include(req, resp);
     }
 }

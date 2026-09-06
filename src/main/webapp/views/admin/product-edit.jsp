@@ -1,85 +1,119 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Chinh sua san pham</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f8f9fa; margin: 20px; }
-        .form-container { max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 6px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h2 { text-align: center; margin-bottom: 20px; color: #333; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
-        input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        textarea { height: 80px; resize: vertical; }
-        .radio-group { display: flex; gap: 20px; align-items: center; }
-        .btn-submit { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; }
-        .btn-back { padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px; font-size: 16px; display: inline-block; }
-        .preview-img { max-width: 100px; max-height: 100px; object-fit: cover; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
-    </style>
+    <title>Chỉnh sửa sản phẩm - Admin</title>
 </head>
 <body>
 
-<div class="form-container">
-    <h2>CHINH SUA SAN PHAM</h2>
-    <form action="<c:url value='/admin/product/update'/>" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="productId" value="${product.productId}" />
+    <div class="mb-4">
+        <h4 class="fw-bold mb-1">CHỈNH SỬA SẢN PHẨM</h4>
+        <p class="text-muted small mb-0">Cập nhật thông tin sản phẩm #${product.productId}</p>
+    </div>
 
-        <div class="form-group">
-            <label>Ten san pham:</label>
-            <input type="text" name="productName" value="${product.productName}" required />
+    <c:if test="${not empty error}">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Lỗi:</strong> ${error}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-        <div class="form-group">
-            <label>Danh muc thuoc ve (Quan he 1-N):</label>
-            <select name="categoryId" required>
-                <c:forEach var="c" items="${categories}">
-                    <option value="${c.categoryid}" ${product.category != null && product.category.categoryid == c.categoryid ? 'selected' : ''}>
-                        ${c.categoryname}
-                    </option>
-                </c:forEach>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Gia ban (VND):</label>
-            <input type="number" name="price" step="1000" min="0" value="${product.price}" required />
-        </div>
-        <div class="form-group">
-            <label>So luong kho:</label>
-            <input type="number" name="quantity" min="0" value="${product.quantity}" required />
-        </div>
-        <div class="form-group">
-            <label>Hinh anh hien tai:</label>
-            <c:choose>
-                <c:when test="${product.images.substring(0,5) == 'https'}">
-                    <img src="${product.images}" class="preview-img" /><br/>
-                </c:when>
-                <c:otherwise>
-                    <c:url value="/image?fname=${product.images}" var="imgUrl"/>
-                    <img src="${imgUrl}" class="preview-img" /><br/>
-                </c:otherwise>
-            </c:choose>
-            <input type="hidden" name="images" value="${product.images}" />
-            <label style="margin-top: 8px;">Chon file anh moi de thay the (Multipart):</label>
-            <input type="file" name="images1" />
-        </div>
-        <div class="form-group">
-            <label>Mo ta san pham:</label>
-            <textarea name="description">${product.description}</textarea>
-        </div>
-        <div class="form-group">
-            <label>Trang thai:</label>
-            <div class="radio-group">
-                <label><input type="radio" name="status" value="1" ${product.status == 1 ? 'checked' : ''} /> Hoat dong</label>
-                <label><input type="radio" name="status" value="0" ${product.status == 0 ? 'checked' : ''} /> Khoa / Ngung ban</label>
-            </div>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-            <a href="<c:url value='/admin/products'/>" class="btn-back">Quay lai</a>
-            <button type="submit" class="btn-submit">Cap nhat</button>
-        </div>
-    </form>
-</div>
+    </c:if>
 
+    <div class="card shadow-sm border-0" style="max-width: 800px;">
+        <div class="card-body p-4">
+            <form action="<c:url value='/admin/product/update'/>" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                <input type="hidden" name="productId" value="${product.productId}" />
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold small">Tên sản phẩm: <span class="text-danger">*</span></label>
+                        <input type="text" name="productName" class="form-control" value="${product.productName}" required minlength="2" placeholder="Nhập tên sản phẩm..." />
+                        <div class="invalid-feedback small">Vui lòng nhập tên sản phẩm (tối thiểu 2 ký tự).</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold small">Danh mục: <span class="text-danger">*</span></label>
+                        <select name="categoryId" class="form-select" required>
+                            <c:forEach items="${categories}" var="c">
+                                <option value="${c.categoryid}" ${product.category != null && product.category.categoryid == c.categoryid ? 'selected' : ''}>
+                                    ${c.categoryname}
+                                </option>
+                            </c:forEach>
+                        </select>
+                        <div class="invalid-feedback small">Vui lòng chọn danh mục.</div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Đơn giá (VND): <span class="text-danger">*</span></label>
+                        <input type="number" step="1000" min="0" name="price" class="form-control" value="${product.price}" required placeholder="Ví dụ: 15000000" />
+                        <div class="invalid-feedback small">Đơn giá phải là số dương hợp lệ.</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold small">Số lượng:</label>
+                        <input type="number" min="0" name="quantity" class="form-control" value="${product.quantity}" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold small">Trạng thái:</label>
+                        <select name="status" class="form-select">
+                            <option value="1" ${product.status == 1 ? 'selected' : ''}>Kinh doanh</option>
+                            <option value="0" ${product.status == 0 ? 'selected' : ''}>Tạm ngưng</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Mô tả sản phẩm:</label>
+                    <textarea name="description" class="form-control" rows="3">${product.description}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Hình ảnh hiện tại:</label>
+                    <div class="mb-2">
+                        <c:choose>
+                            <c:when test="${not empty product.images and product.images.startsWith('http')}">
+                                <img src="${product.images}" class="rounded border" style="width: 80px; height: 80px; object-fit: cover;" alt="${product.productName}" />
+                            </c:when>
+                            <c:when test="${not empty product.images}">
+                                <img src="<c:url value='/image?fname=${product.images}'/>" class="rounded border" style="width: 80px; height: 80px; object-fit: cover;" alt="${product.productName}" />
+                            </c:when>
+                            <c:otherwise>
+                                <img src="<c:url value='/image?fname=avatar.png'/>" class="rounded border" style="width: 80px; height: 80px; object-fit: cover;" alt="${product.productName}" />
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                    <input type="file" name="images1" class="form-control" accept="image/*" />
+                    <div class="form-text small">Chọn file nếu muốn thay thế ảnh cũ.</div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold small">Hoặc cập nhật URL hình ảnh:</label>
+                    <input type="url" name="images" class="form-control" value="${product.images.startsWith('http') ? product.images : ''}" placeholder="https://example.com/product.jpg" />
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-4 fw-semibold">Cập nhật sản phẩm</button>
+                    <a href="<c:url value='/admin/products'/>" class="btn btn-outline-secondary">Hủy bỏ</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
 </body>
 </html>

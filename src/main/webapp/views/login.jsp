@@ -1,61 +1,101 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Dang nhap</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập hệ thống</title>
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 40px; }
-        .card { max-width: 380px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 6px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #333; margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
-        input[type="text"], input[type="password"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .remember-group { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; font-size: 14px; }
-        .btn-submit { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
-        .btn-submit:hover { background-color: #0056b3; }
-        .alert { padding: 10px; margin-bottom: 15px; border-radius: 4px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; font-size: 14px; }
-        .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .footer-links { margin-top: 15px; text-align: center; font-size: 14px; }
-        .footer-links a { color: #007bff; text-decoration: none; margin: 0 5px; }
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            padding: 30px;
+        }
     </style>
 </head>
 <body>
-<div class="card">
-    <h2>Dang nhap he thong</h2>
+
+<div class="login-card">
+    <div class="text-center mb-4">
+        <h3 class="fw-bold text-primary mb-1">ĐĂNG NHẬP</h3>
+        <p class="text-muted small">Hệ thống quản lý bán hàng &amp; hồ sơ</p>
+    </div>
 
     <c:if test="${not empty successAlert}">
-        <div class="alert alert-success">${successAlert}</div>
-    </c:if>
-    <c:if test="${not empty alert}">
-        <div class="alert">${alert}</div>
+        <div class="alert alert-success py-2 small" role="alert">
+            ${successAlert}
+        </div>
     </c:if>
 
-    <form action="<c:url value='/login'/>" method="post">
-        <div class="form-group">
-            <label>Ten dang nhap:</label>
-            <input type="text" name="username" value="${not empty rememberUser ? rememberUser : ''}" required placeholder="Nhap username" />
+    <c:if test="${not empty alert}">
+        <div class="alert alert-danger py-2 small" role="alert">
+            ${alert}
         </div>
-        <div class="form-group">
-            <label>Mat khau:</label>
-            <input type="password" name="password" required placeholder="Nhap mat khau" />
+    </c:if>
+
+    <form action="<c:url value='/login'/>" method="post" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label class="form-label fw-semibold small">Tên đăng nhập:</label>
+            <input type="text" name="username" class="form-control" 
+                   value="${not empty username ? username : (not empty rememberUser ? rememberUser : '')}" 
+                   required placeholder="Nhập tên đăng nhập..." />
+            <div class="invalid-feedback small">Vui lòng nhập tên đăng nhập.</div>
         </div>
-        <div class="remember-group">
-            <label style="font-weight: normal; margin-bottom: 0; display: flex; align-items: center;">
-                <input type="checkbox" name="remember" ${not empty rememberUser ? 'checked' : ''} style="margin-right: 5px;" />
-                Remember me
-            </label>
-            <a href="<c:url value='/forgot-password'/>" style="color: #6c757d; text-decoration: none;">Quen mat khau?</a>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold small">Mật khẩu:</label>
+            <input type="password" name="password" class="form-control" required placeholder="Nhập mật khẩu..." />
+            <div class="invalid-feedback small">Vui lòng nhập mật khẩu.</div>
         </div>
-        <button type="submit" class="btn-submit">Dang nhap</button>
+
+        <div class="d-flex justify-content-between align-items-center mb-4 small">
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="rememberMe" name="remember" ${not empty rememberUser ? 'checked' : ''} />
+                <label class="form-check-label text-muted" for="rememberMe">Ghi nhớ đăng nhập</label>
+            </div>
+            <a href="<c:url value='/forgot-password'/>" class="text-decoration-none">Quên mật khẩu?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold mb-3">Đăng nhập</button>
     </form>
 
-    <div class="footer-links">
-        Chua co tai khoan? <a href="<c:url value='/register'/>"><b>Dang ky ngay</b></a>
-        <br/><br/>
-        <a href="<c:url value='/home'/>">Ve trang chu</a>
+    <div class="text-center small border-top pt-3 text-muted">
+        Chưa có tài khoản? <a href="<c:url value='/register'/>" class="fw-bold text-decoration-none">Đăng ký ngay</a>
+        <div class="mt-2">
+            <a href="<c:url value='/home'/>" class="text-secondary text-decoration-none">Quay lại trang chủ</a>
+        </div>
     </div>
 </div>
+
+<script>
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+</script>
 </body>
 </html>
